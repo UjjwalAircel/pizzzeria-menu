@@ -17,33 +17,6 @@ font-family:sans-serif;
 overflow:hidden;
 }
 
-/* splash */
-
-#splash{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#000;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:10;
-}
-
-#splash img{
-width:140px;
-animation:fade 1.5s infinite alternate;
-}
-
-@keyframes fade{
-from{opacity:.4}
-to{opacity:1}
-}
-
-/* viewer */
-
 .viewer{
 position:relative;
 width:100%;
@@ -72,9 +45,8 @@ align-items:center;
 width:100%;
 touch-action:none;
 transform-origin:center;
+transition:transform .25s ease;
 }
-
-/* navigation */
 
 .nav{
 position:absolute;
@@ -90,8 +62,6 @@ padding:8px 12px;
 .prev{left:0}
 .next{right:0}
 
-/* page indicator */
-
 .page{
 position:absolute;
 bottom:14px;
@@ -104,33 +74,11 @@ border-radius:20px;
 font-size:14px;
 }
 
-/* whatsapp button */
-
-.whatsapp{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25D366;
-color:white;
-padding:14px 18px;
-border-radius:50px;
-font-size:18px;
-text-decoration:none;
-box-shadow:0 4px 10px rgba(0,0,0,.4);
-z-index:5;
-}
-
 </style>
 
 </head>
 
 <body>
-
-<!-- splash screen -->
-
-<div id="splash">
-<img src="logo.png">
-</div>
 
 <div class="viewer">
 
@@ -138,17 +86,9 @@ z-index:5;
 
 <div class="slider" id="slider">
 
-<div class="slide">
-<img src="images/menu1.jpg">
-</div>
-
-<div class="slide">
-<img src="images/menu2.jpg">
-</div>
-
-<div class="slide">
-<img src="images/menu3.jpg">
-</div>
+<div class="slide"><img src="images/menu1.jpg"></div>
+<div class="slide"><img src="images/menu2.jpg"></div>
+<div class="slide"><img src="images/menu3.jpg"></div>
 
 </div>
 
@@ -158,18 +98,7 @@ z-index:5;
 
 </div>
 
-<a class="whatsapp"
-href="https://wa.me/91XXXXXXXXXX?text=I%20want%20to%20order%20pizza">
-Order
-</a>
-
 <script>
-
-/* hide splash */
-
-setTimeout(()=>{
-document.getElementById("splash").style.display="none"
-},1500)
 
 /* slider */
 
@@ -182,7 +111,6 @@ const total=slider.children.length
 function update(){
 
 slider.style.transform="translateX(-"+(index*100)+"%)"
-
 page.innerText=(index+1)+" / "+total
 
 }
@@ -203,32 +131,17 @@ update()
 
 }
 
-/* swipe */
-
-let startX=0
-
-slider.addEventListener("touchstart",e=>{
-startX=e.touches[0].clientX
-})
-
-slider.addEventListener("touchend",e=>{
-
-let endX=e.changedTouches[0].clientX
-
-if(startX-endX>60) next()
-if(endX-startX>60) prev()
-
-})
-
-/* zoom */
+/* zoom system */
 
 document.querySelectorAll("img").forEach(img=>{
 
 let scale=1
 let lastTap=0
 let startDist=0
+
 let posX=0
 let posY=0
+
 let startX=0
 let startY=0
 
@@ -250,12 +163,6 @@ img.style.transform=
 
 img.addEventListener("touchstart",e=>{
 
-if(e.touches.length==2){
-
-startDist=dist(e.touches[0],e.touches[1])
-
-}
-
 if(e.touches.length==1){
 
 startX=e.touches[0].clientX
@@ -263,15 +170,25 @@ startY=e.touches[0].clientY
 
 }
 
+if(e.touches.length==2){
+
+startDist=dist(e.touches[0],e.touches[1])
+
+}
+
 })
 
 img.addEventListener("touchmove",e=>{
+
+/* pinch zoom */
 
 if(e.touches.length==2){
 
 let newDist=dist(e.touches[0],e.touches[1])
 
-scale*=newDist/startDist
+let zoomFactor=newDist/startDist
+
+scale*=zoomFactor
 
 if(scale<1) scale=1
 if(scale>4) scale=4
@@ -281,6 +198,8 @@ startDist=newDist
 apply()
 
 }
+
+/* drag image */
 
 else if(e.touches.length==1 && scale>1){
 
@@ -299,19 +218,24 @@ apply()
 
 })
 
-img.addEventListener("touchend",()=>{
+img.addEventListener("touchend",e=>{
 
 let now=Date.now()
+
+/* double tap */
 
 if(now-lastTap<300){
 
 if(scale===1){
+
 scale=2
-}
-else{
+
+}else{
+
 scale=1
 posX=0
 posY=0
+
 }
 
 apply()
@@ -321,6 +245,33 @@ apply()
 lastTap=now
 
 })
+
+})
+
+/* swipe page change */
+
+let startSwipeX=0
+
+slider.addEventListener("touchstart",e=>{
+startSwipeX=e.touches[0].clientX
+})
+
+slider.addEventListener("touchend",e=>{
+
+let endX=e.changedTouches[0].clientX
+
+let activeImg=slider.children[index].querySelector("img")
+
+/* zoom active হলে swipe disable */
+
+let transform=activeImg.style.transform
+
+if(transform.includes("scale(1)") || transform===""){
+
+if(startSwipeX-endX>60) next()
+if(endX-startSwipeX>60) prev()
+
+}
 
 })
 
