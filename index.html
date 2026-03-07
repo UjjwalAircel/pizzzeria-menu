@@ -12,7 +12,7 @@
 
 body{
 margin:0;
-background:#000;
+background:black;
 overflow:hidden;
 font-family:sans-serif;
 }
@@ -24,25 +24,25 @@ max-width:650px;
 height:100vh;
 margin:auto;
 overflow:hidden;
-display:flex;
-align-items:center;
 }
 
 .slider{
 display:flex;
-width:100%;
+height:100%;
 transition:transform .3s ease;
 }
 
 .slide{
 min-width:100%;
+height:100%;
 display:flex;
 justify-content:center;
 align-items:center;
 }
 
 .slide img{
-width:100%;
+max-width:100%;
+max-height:100%;
 touch-action:none;
 transform-origin:center;
 }
@@ -68,15 +68,15 @@ z-index:5;
 
 .page{
 position:absolute;
-bottom:14px;
+bottom:12px;
 left:50%;
 transform:translateX(-50%);
 color:white;
-background:rgba(0,0,0,0.5);
-padding:4px 12px;
+background:rgba(0,0,0,0.6);
+padding:4px 14px;
 border-radius:20px;
 font-size:14px;
-z-index:5;
+z-index:10;
 }
 
 </style>
@@ -99,16 +99,13 @@ z-index:5;
 
 <script>
 
-/* ---------- IMAGE LIST ---------- */
-/* এখানে যত menu image থাকবে add করো */
+/* IMAGE LIST */
 
 const images=[
 "images/menu1.jpg",
 "images/menu2.jpg",
 "images/menu3.jpg"
 ]
-
-/* ---------- CREATE SLIDES ---------- */
 
 const slider=document.getElementById("slider")
 
@@ -121,12 +118,11 @@ let img=document.createElement("img")
 img.src=src
 
 slide.appendChild(img)
-
 slider.appendChild(slide)
 
 })
 
-/* ---------- SLIDER ---------- */
+/* SLIDER */
 
 const page=document.getElementById("page")
 
@@ -158,7 +154,7 @@ update()
 
 update()
 
-/* ---------- ZOOM SYSTEM ---------- */
+/* ZOOM */
 
 document.querySelectorAll(".slide img").forEach(img=>{
 
@@ -176,7 +172,6 @@ function distance(a,b){
 
 let dx=a.clientX-b.clientX
 let dy=a.clientY-b.clientY
-
 return Math.sqrt(dx*dx+dy*dy)
 
 }
@@ -210,7 +205,6 @@ img.addEventListener("touchmove",e=>{
 if(e.touches.length===2){
 
 let newDist=distance(e.touches[0],e.touches[1])
-
 let factor=newDist/startDist
 
 scale*=factor
@@ -269,7 +263,7 @@ lastTap=now
 
 })
 
-/* ---------- SWIPE ---------- */
+/* SWIPE */
 
 let swipeStart=0
 
